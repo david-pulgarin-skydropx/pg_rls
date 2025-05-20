@@ -128,6 +128,45 @@ end
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
+### Migration Methods
+
+PgRls provides several methods to help with creating and managing tables and indexes in a multi-tenant environment:
+
+#### Table Management
+- `create_rls_table` - Creates a new table with RLS enabled
+- `drop_rls_table` - Drops an RLS-enabled table
+- `convert_to_rls_table` - Converts an existing table to use RLS
+
+#### Tenant Table Management
+- `create_rls_tenant_table` - Creates a new tenant table with RLS enabled
+- `drop_rls_tenant_table` - Drops an RLS-enabled tenant table
+- `convert_to_rls_tenant_table` - Converts an existing table to a tenant table with RLS
+
+#### Index Management
+- `create_rls_index` - Creates an optimized index for RLS queries that includes the tenant_id as the first column
+
+Example usage in migrations:
+```ruby
+class CreateUsers < ActiveRecord::Migration[6.1]
+  def change
+    create_rls_table :users do |t|
+      t.string :name
+      t.string :email
+      t.timestamps
+    end
+    
+    # Create an RLS-optimized index on the email field
+    create_rls_index :users, :email
+    
+    # Create an RLS-optimized index with multiple columns
+    create_rls_index :users, [:name, :email]
+    
+    # Create an RLS-optimized index with custom options
+    create_rls_index :users, :email, name: 'custom_index_name', using: 'btree', where: 'email IS NOT NULL'
+  end
+end
+```
+
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
