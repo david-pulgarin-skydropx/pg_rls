@@ -99,6 +99,23 @@ module PgRls
             USING (tenant_id = NULLIF(current_setting('rls.tenant_id', TRUE), '')::uuid);
         SQL
       end
+
+      def create_rls_index(table_name, columns, **options)
+        columns_array = Array(columns)
+        index_name = options[:name] || rls_index_name(table_name, columns_array)
+        
+        using = options[:using] ? "USING #{options[:using]}" : ''
+        where = options[:where] ? "WHERE #{options[:where]}" : ''
+        
+        column_list = ["tenant_id", *columns_array].join(', ')
+        
+        ActiveRecord::Migration.execute <<-SQL.squish
+          CREATE INDEX #{index_name}
+          ON #{table_name} #{using}
+          (#{column_list})
+          #{where};
+        SQL
+      end
     end
   end
 end
