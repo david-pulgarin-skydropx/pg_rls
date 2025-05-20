@@ -67,6 +67,14 @@ module PgRls
         drop_rls_policy(table_name)
         drop_rls_column(table_name)
       end
+
+      private
+
+      def rls_index_name(table_name, columns_array)
+        safe_table = table_name.to_s.gsub(/[^a-zA-Z0-9_]/, '')
+        safe_columns = columns_array.map { |col| col.to_s.gsub(/[^a-zA-Z0-9_]/, '') }
+        "index_#{safe_table}_on_tenant_id_and_#{safe_columns.join('_and_')}"
+      end
     end
   end
 end
