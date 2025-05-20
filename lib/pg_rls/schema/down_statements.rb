@@ -49,6 +49,18 @@ module PgRls
           ALTER TABLE #{table_name} DISABLE ROW LEVEL SECURITY;
         SQL
       end
+
+      def drop_rls_index(table_name, columns, **options)
+        # Ensure columns is an array
+        columns_array = Array(columns)
+        
+        # Generate index name from the parameters or use the provided name
+        index_name = options[:name] || "index_#{table_name}_on_tenant_id_and_#{columns_array.join('_and_')}"
+        
+        ActiveRecord::Migration.execute <<-SQL.squish
+          DROP INDEX IF EXISTS #{index_name};
+        SQL
+      end
     end
   end
 end
