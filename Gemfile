@@ -8,7 +8,7 @@ gemspec
 gem "rake", "~> 13.0"
 
 group :development, :test do
-  gem "rails", "~> 7.2.2"
+  gem "rails", "~> 8.1.1"
 
   # Guard automatically & intelligently launch tests [https://github.com/guard/guard-minitest]
   gem "guard" # NOTE: this is necessary in newer versions
